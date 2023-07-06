@@ -1,35 +1,55 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>3c70fc3c-5782-4358-a86f-04345a6f7ff3</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
-    <StartupFile>DB_merger_for_Acteon_SOPROS_image_software.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
-    <WorkingDirectory>.</WorkingDirectory>
-    <OutputPath>.</OutputPath>
-    <Name>DB merger for Acteon SOPROS image software</Name>
-    <RootNamespace>DB merger for Acteon SOPROS image software</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugSymbols>true</DebugSymbols>
-    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugSymbols>true</DebugSymbols>
-    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="DB_merger_for_Acteon_SOPROS_image_software.py" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
-  <!-- Uncomment the CoreCompile target to enable the Build command in
-       Visual Studio and specify your pre- and post-build commands in
-       the BeforeBuild and AfterBuild targets below. -->
-  <!--<Target Name="CoreCompile" />-->
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-</Project>
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jun 20 02:11:06 2023
+
+@author: Simas Simanavicius
+
+Program does not move entries from one DB to another. its should be done manualy
+
+program renames entries in second database that it can be moved properly to the DB nr1. it saves most of the time
+"""
+import os
+
+#Should be promt in the future or make IDE
+#main DB
+db1 = "c:/db/db1"
+db1data = db1+"/0-9999"
+
+#secondary DB
+db2 = "c:/db/db3"
+db2data = db2+"/0-9999"
+
+a = 0
+b = 99
+c = 0 #lasst entry in main DB
+
+mainsize = len(os.listdir(db1data))
+secondary_size = len(os.listdir(db2data))
+
+dataset = [] #main DB how many sets are in DB 0-99, 100-199 etc
+
+# get sub-folder names and store in list as datasets
+for i in range(mainsize): 
+    dataset.append(str(a)+"-"+str(b))
+    a = a+100
+    b = b+100
+
+#get next entry in main DB to make
+c = a-100 + len(os.listdir(db1data+"/"+dataset[-1]))
+
+#rename elements to be ready be moved into new DB 
+for i in range(secondary_size): # cycle for all folders in DB
+    print(os.path.join(db2data+"/"+dataset[i]))
+    os.chdir(os.path.join(db2data+"/"+dataset[i]))
+    for x in os.listdir(os.path.join(db2data+"/"+dataset[i])):
+        print("current name", x)
+        os.rename(str(x),str(c))
+        print("name changed to:", c)
+        c=c+1
+        
+
+
+#how many items is in the last set of entries
+print("Last sub-folder has " + str(len(os.listdir(db1data+"/"+dataset[-1]))) + " entries")
+
+
